@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int globalChecker = 0;
+double** A = NULL;
+double** prettyNew = NULL;
 double** randmm(int rows, int cols)
 {
     double** matrix = (double**)malloc(rows * sizeof(double*));
@@ -19,6 +22,19 @@ double** randmm(int rows, int cols)
     }
 
     return matrix;
+}
+
+void zhdac ( HWND* hWnd )
+{
+    printf("\nWaiting for click\n");
+    while (1)
+    {
+		if (_kbhit()) {
+			char c = _getch();
+			InvalidateRect(*hWnd, NULL, TRUE);
+			break;
+		}
+	}
 }
 
 double** mulmr(double num, double **mat, int rows, int cols)
@@ -86,7 +102,7 @@ double** condenc (double** mat, double** checkin, double** svyaz, int row, int c
 void drawer ( HDC hdc, double** A, int rows )
 {
             char *nn[11] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b"};
-            void arrow(float fi, int px,int py){
+            void arrow( float fi, int px, int py ){
             fi = 3.1416*(180.0 - fi)/180.0;
             int lx,ly,rx,ry;
             lx = px+15*cos(fi+0.3);
@@ -128,6 +144,7 @@ void drawer ( HDC hdc, double** A, int rows )
             {
                 for (int j = 0; j < rows; j++)
                 {
+                    if(globalChecker) printf("%i ", A[i][j]);
                     if ( A[i][j] == 1 ) {
                         MoveToEx(hdc, nx[i], ny[i], NULL);
                         if ( i != ( j + 1 ) && j != ( i + 1 ) ) {
@@ -313,6 +330,7 @@ void drawer ( HDC hdc, double** A, int rows )
                         }
                     }
                 }
+                if(globalChecker) printf("\n");
             }
             SelectObject(hdc, BPen);
             for ( i = 0; i < rows; i++ ){
@@ -321,85 +339,25 @@ void drawer ( HDC hdc, double** A, int rows )
             }
 }
 
+
+void globalCheckIt ( HDC hdc )
+{
+    if ( !globalChecker && A != NULL ) drawer( hdc, A, 11 );
+    else if( prettyNew != NULL) drawer( hdc, prettyNew, 2 );
+    else printf("\nOups, something is wrong...");
+}
+
+
+
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 
-char ProgName[] = "lab 3";
-
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow)
+DWORD WINAPI somethingcool (LPVOID lpParam)
 {
-    HWND hWnd;
-    MSG lpMsg;
-
-    WNDCLASS w; //ñîçäà¸ì ýêçåìïëÿð ñòðóêòóðû WNDCLASS
-
-    w.lpszClassName=ProgName; //èìÿ ïðîãðàììû - îáúÿâëåíî âûøå
-    w.hInstance=hInstance; //èäåíòèôèêàòîð òåêóùåãî ïðèëîæåíèÿ
-    w.lpfnWndProc=WndProc; //óêàçàòåëü íà ôóíêöèþ îêíà
-    w.hCursor=LoadCursor(NULL, IDC_ARROW); //çàãðóæàåì êóðñîð
-    w.hIcon=0; //èêîíêè ó íàñ íå áóäåò ïîêà
-    w.lpszMenuName=0; //è ìåíþ ïîêà íå áóäåò
-    w.hbrBackground = LTGRAY_BRUSH; //WHITE_BRUSH;// öâåò ôîíà îêíà
-    w.style=CS_HREDRAW|CS_VREDRAW; //ñòèëü - ïåðåðèñîâûâàåìîå ïî õ è ïî ó
-    w.cbClsExtra=0;
-    w.cbWndExtra=0;
-
-    if(!RegisterClass(&w))
-        return 0;
-
-   // HWND hWnd;
-    //MSG lpMsg;
-
-//Ñîçäàäèì îêíî â ïàìÿòè, çàïîëíèâ àðãóìåíòû CreateWindow
-    hWnd=CreateWindow(ProgName, //Èìÿ ïðîãðàììû
-        "lab 3", //Çàãîëîâîê îêíà
-        WS_OVERLAPPEDWINDOW, //Ñòèëü îêíà - ïåðåêðûâàþùååñÿ
-        0, //ïîëîæåíèå îêíà íà ýêðàíå ïî õ
-        0, //ïîëîæåíèå ïî ó
-        1920, //øèðèíà
-        1080, //âèñîòà
-        (HWND)NULL, //èäåíòèôèêàòîð ðîäèòåëüñêîãî îêíà
-        (HMENU)NULL, //èäåíòèôèêàòîð ìåíþ
-        (HINSTANCE)hInstance, //èäåíòèôèêàòîð ýêçåìïëÿðà ïðîãðàììû
-        (HINSTANCE)NULL); //îòñóòñòâèå äîïîëíèòåëüíûõ ïàðàìåòðîâ
-
-//Âûâîäèì îêíî èç ïàìÿòè íà ýêðàí
-    ShowWindow(hWnd, nCmdShow);
-//Îáíîâèì ñîäåðæèìîå îêíà
- //   UpdateWindow(hWnd);
-
-//Öèêë îäåðæàííÿ ïîâ³äîìëåíü
-
-    while(GetMessage(&lpMsg, hWnd, 0, 0)) { //Ïîëó÷àåì ñîîáùåíèå èç î÷åðåäè
-            TranslateMessage(&lpMsg); //Ïðåîáðàçóåò ñîîáùåíèÿ êëàâèø â ñèìâîëû
-            DispatchMessage(&lpMsg); //Ïåðåäà¸ò ñîîáùåíèå ñîîòâåòñòâóþùåé ôóíêöèè îêíà
-        }
-    return(lpMsg.wParam);
-    }
-
-//Ôóíêöèÿ îêíà
-LRESULT CALLBACK WndProc(HWND hWnd, UINT messg,
-                        WPARAM wParam, LPARAM lParam)
-    {
-    HDC hdc; //ñîçäà¸ì êîíòåêñò óñòðîéñòâà
-    PAINTSTRUCT ps; //ñîçäà¸ì ýêçåìïëÿð ñòðóêòóðû ãðàôè÷åñêîãî âûâîäà
-
-
-
-//Öèêë îáðàáîòêè ñîîáùåíèé
-    switch(messg){
-    //ñîîáùåíèå ðèñîâàíèÿ
-        case WM_PAINT :
-
-
-            hdc=BeginPaint(hWnd, &ps);
-
-
-
-            srand(0315);
+    srand(0315);
             double** T = randmm(11, 11);
             double coef = 1.0 - 1*0.005 - 5*0.005 - 0.27;
-            double** A = mulmr(coef, T, 11, 11);
+            A = mulmr(coef, T, 11, 11);
             //naprav graf matrix
             printf("\nMatrix:\n");
             for (int i = 0; i < 11; i++)
@@ -411,7 +369,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT messg,
                 printf("\n");
             }
             //nenaprav graf matrix
-            drawer( hdc, A, 11 );
+
             double B[11][11] = {};
             for (int i = 0; i < 11; i++)
             {
@@ -575,7 +533,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT messg,
                 }
 
             }
-            double** prettyNew = randmm(on,on);
+            prettyNew = randmm(on,on);
             for ( int i = 0; i < on; i++ )
                 for ( int j = 0; j < on; j++ )
                     prettyNew[i][j] = 0;
@@ -583,35 +541,93 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT messg,
             int b = pretty[0][10];
             int from = -1;
             int to = -1;
-            for ( int i = 1; i <= a; i++ )
-                for ( int j = 0; j <= b; j++ )
+            for ( int i = pretty[1][0]; i <= pretty[1][0]; i++ )
+                for ( int j = 0; j < 11; j++ )
                 if ( smt[i][j] ) {
                     pretty[i][1] = 1;
                     break;
                 }
-            printf("\nto draw condenc graph\n");
-            int x = -1;
-            //while ( 1 )
-            //{
-                //printf("write number > 0\n");
-                //scanf("%i", &x);
-                //if ( x > 0 ) break;
-            //}
-            //drawer(hdc, pretty, on);
-/*
-            for ( int i = 0; i < 4; i++ ) {
-                for ( int j = 0; j < 8; j++ ) {
-                    printf("%.0f ",prettyNew[i][j]);
-                }
-                printf("\n");
-            }
-*/
-            //kondensacia
-            //double** useless = randmm(someN,someN);
+            printf("\nCondenc graph\n");
+            zhdac(lpParam);
+            globalChecker = 1;
+}
 
-            //double** condenMat = condenc(useless,prettyNew,A,someN,someN);
 
-            //drawings
+
+char ProgName[] = "lab 3";
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow)
+{
+    HWND hWnd;
+    MSG lpMsg;
+
+    WNDCLASS w; //ñîçäà¸ì ýêçåìïëÿð ñòðóêòóðû WNDCLASS
+
+    w.lpszClassName=ProgName; //èìÿ ïðîãðàììû - îáúÿâëåíî âûøå
+    w.hInstance=hInstance; //èäåíòèôèêàòîð òåêóùåãî ïðèëîæåíèÿ
+    w.lpfnWndProc=WndProc; //óêàçàòåëü íà ôóíêöèþ îêíà
+    w.hCursor=LoadCursor(NULL, IDC_ARROW); //çàãðóæàåì êóðñîð
+    w.hIcon=0; //èêîíêè ó íàñ íå áóäåò ïîêà
+    w.lpszMenuName=0; //è ìåíþ ïîêà íå áóäåò
+    w.hbrBackground = LTGRAY_BRUSH; //WHITE_BRUSH;// öâåò ôîíà îêíà
+    w.style=CS_HREDRAW|CS_VREDRAW; //ñòèëü - ïåðåðèñîâûâàåìîå ïî õ è ïî ó
+    w.cbClsExtra=0;
+    w.cbWndExtra=0;
+
+    if(!RegisterClass(&w))
+        return 0;
+
+   // HWND hWnd;
+    //MSG lpMsg;
+
+//Ñîçäàäèì îêíî â ïàìÿòè, çàïîëíèâ àðãóìåíòû CreateWindow
+    hWnd=CreateWindow(ProgName, //Èìÿ ïðîãðàììû
+        "lab 3", //Çàãîëîâîê îêíà
+        WS_OVERLAPPEDWINDOW, //Ñòèëü îêíà - ïåðåêðûâàþùååñÿ
+        0, //ïîëîæåíèå îêíà íà ýêðàíå ïî õ
+        0, //ïîëîæåíèå ïî ó
+        1920, //øèðèíà
+        1080, //âèñîòà
+        (HWND)NULL, //èäåíòèôèêàòîð ðîäèòåëüñêîãî îêíà
+        (HMENU)NULL, //èäåíòèôèêàòîð ìåíþ
+        (HINSTANCE)hInstance, //èäåíòèôèêàòîð ýêçåìïëÿðà ïðîãðàììû
+        (HINSTANCE)NULL); //îòñóòñòâèå äîïîëíèòåëüíûõ ïàðàìåòðîâ
+
+//Âûâîäèì îêíî èç ïàìÿòè íà ýêðàí
+    ShowWindow(hWnd, nCmdShow);
+     DWORD dwThreadId = 1;
+
+        HANDLE cool;
+        cool = CreateThread(NULL, 0, somethingcool, &hWnd, 0, &dwThreadId);
+//Îáíîâèì ñîäåðæèìîå îêíà
+ //   UpdateWindow(hWnd);
+
+//Öèêë îäåðæàííÿ ïîâ³äîìëåíü
+
+    while(GetMessage(&lpMsg, hWnd, 0, 0)) { //Ïîëó÷àåì ñîîáùåíèå èç î÷åðåäè
+            TranslateMessage(&lpMsg); //Ïðåîáðàçóåò ñîîáùåíèÿ êëàâèø â ñèìâîëû
+            DispatchMessage(&lpMsg); //Ïåðåäà¸ò ñîîáùåíèå ñîîòâåòñòâóþùåé ôóíêöèè îêíà
+        }
+    return(lpMsg.wParam);
+    }
+
+//Ôóíêöèÿ îêíà
+LRESULT CALLBACK WndProc(HWND hWnd, UINT messg,
+                        WPARAM wParam, LPARAM lParam)
+    {
+    HDC hdc; //ñîçäà¸ì êîíòåêñò óñòðîéñòâà
+    PAINTSTRUCT ps; //ñîçäà¸ì ýêçåìïëÿð ñòðóêòóðû ãðàôè÷åñêîãî âûâîäà
+
+
+
+//Öèêë îáðàáîòêè ñîîáùåíèé
+    switch(messg){
+    //ñîîáùåíèå ðèñîâàíèÿ
+        case WM_PAINT :
+
+
+            hdc=BeginPaint(hWnd, &ps);
+            globalCheckIt ( hdc );
             EndPaint(hWnd, &ps);
             break;
 
