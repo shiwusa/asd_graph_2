@@ -83,76 +83,12 @@ double** condenc (double** mat, double** checkin, double** svyaz, int row, int c
     return mat;
 }
 
-//Создаём прототип функции окна, которая будет определена ниже
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-
-//void arrow(float fi, int px,int py);
-
-//объявляем строку-имя программы
-char ProgName[] = "Лабораторна робота 3";
-
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow)
+void drawer ( HDC hdc, double** A )
 {
-    HWND hWnd;
-    MSG lpMsg;
-
-    WNDCLASS w; //создаём экземпляр структуры WNDCLASS
-
-    w.lpszClassName=ProgName; //имя программы - объявлено выше
-    w.hInstance=hInstance; //идентификатор текущего приложения
-    w.lpfnWndProc=WndProc; //указатель на функцию окна
-    w.hCursor=LoadCursor(NULL, IDC_ARROW); //загружаем курсор
-    w.hIcon=0; //иконки у нас не будет пока
-    w.lpszMenuName=0; //и меню пока не будет
-    w.hbrBackground = LTGRAY_BRUSH; //WHITE_BRUSH;// цвет фона окна
-    w.style=CS_HREDRAW|CS_VREDRAW; //стиль - перерисовываемое по х и по у
-    w.cbClsExtra=0;
-    w.cbWndExtra=0;
-
-    if(!RegisterClass(&w))
-        return 0;
-
-   // HWND hWnd;
-    //MSG lpMsg;
-
-//Создадим окно в памяти, заполнив аргументы CreateWindow
-    hWnd=CreateWindow(ProgName, //Имя программы
-        "Лабораторна робота 3", //Заголовок окна
-        WS_OVERLAPPEDWINDOW, //Стиль окна - перекрывающееся
-        0, //положение окна на экране по х
-        0, //положение по у
-        1920, //ширина
-        1080, //висота
-        (HWND)NULL, //идентификатор родительского окна
-        (HMENU)NULL, //идентификатор меню
-        (HINSTANCE)hInstance, //идентификатор экземпляра программы
-        (HINSTANCE)NULL); //отсутствие дополнительных параметров
-
-//Выводим окно из памяти на экран
-    ShowWindow(hWnd, nCmdShow);
-//Обновим содержимое окна
- //   UpdateWindow(hWnd);
-
-//Цикл одержання повідомлень
-
-    while(GetMessage(&lpMsg, hWnd, 0, 0)) { //Получаем сообщение из очереди
-            TranslateMessage(&lpMsg); //Преобразует сообщения клавиш в символы
-            DispatchMessage(&lpMsg); //Передаёт сообщение соответствующей функции окна
-        }
-    return(lpMsg.wParam);
-    }
-
-//Функция окна
-LRESULT CALLBACK WndProc(HWND hWnd, UINT messg,
-                        WPARAM wParam, LPARAM lParam)
-    {
-    HDC hdc; //создаём контекст устройства
-    PAINTSTRUCT ps; //создаём экземпляр структуры графического вывода
-
-    void arrow(float fi, int px,int py){
+            char *nn[11] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b"};
+            void arrow(float fi, int px,int py){
             fi = 3.1416*(180.0 - fi)/180.0;
-            int lx,ly,rx,ry; //px,py,
-           // px=150; py=60;
+            int lx,ly,rx,ry;
             lx = px+15*cos(fi+0.3);
             rx = px+15*cos(fi-0.3);
             ly = py+15*sin(fi+0.3);
@@ -161,16 +97,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT messg,
             LineTo(hdc, px, py);
             LineTo(hdc, rx, ry);
          //  return 0;
-      }
-
-//Цикл обработки сообщений
-    switch(messg){
-    //сообщение рисования
-        case WM_PAINT :
-
-
-            hdc=BeginPaint(hWnd, &ps);
-            char *nn[11] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b"};
+            }
             int nx[11] = {};
             int ny[11] = {};
             int oneLen = 75;
@@ -196,201 +123,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT messg,
             int i;
             HPEN BPen = CreatePen(PS_SOLID, 2, RGB(50, 0, 255));
             HPEN KPen = CreatePen(PS_SOLID, 1, RGB(20, 20, 5));
-
-
-            srand(0315);
-            double** T = randmm(11, 11);
-            double coef = 1.0 - 1*0.005 - 5*0.005 - 0.27;
-            double** A = mulmr(coef, T, 11, 11);
-            //naprav graf matrix
-            printf("\nMatrix:\n");
-            for (int i = 0; i < 11; i++)
-            {
-                for (int j = 0; j < 11; j++)
-                {
-                    printf("%.0f ", A[i][j]);
-                }
-                printf("\n");
-            }
-            //nenaprav graf matrix
-            double B[11][11] = {};
-            for (int i = 0; i < 11; i++)
-            {
-                for (int j = 0; j < 11; j++)
-                {
-                    B[i][j] = A[i][j];
-                }
-            }
-            printf("\nMirror Matrix:\n");
-            for ( int i = 0; i < 11; i++ )
-            {
-                for ( int j = 0; j < 11; j++ )
-                {
-                    if ( B[i][j] == 1 ){
-                        B[j][i] = 1;
-                    }
-                    printf("%.0f ", B[i][j]);
-                }
-                printf("\n");
-            }
-
-            //stepeni nenaprav
-            int stepNenap[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            printf("\nStepeni nenaprav:\n");
-            for ( int i = 0; i < 11; i++ ) {
-                for ( int j = i; j < 11; j++ ) {
-                    if ( B[i][j] == 1 ) {
-                        stepNenap[i]++;
-                    }
-                }
-                printf("%i  ",stepNenap[i]);
-            }
-            printf("\n");
-            //stepeni naprav
-            int stepNap[11][2] = {};
-            for ( int i = 0; i < 11; i++ ) {
-                stepNap[i][0] = 0;
-                stepNap[i][1] = 0;
-            }
-            for ( int i = 0; i < 11; i++ ) {
-                for ( int j = 0; j < 11; j++ ) {
-                    if ( A[i][j] == 1 ) {
-                        stepNap[i][0]++;
-                        stepNap[j][1]++;
-                    }
-                }
-            }
-            printf("\nStepeni naprav:");
-            printf("\nVixod\tZaxod\n");
-            for ( int i = 0; i < 11; i++ ) {
-                printf( "%i\t%i\n", stepNap[i][0], stepNap[i][1] );
-            }
-            //izolirovannie i visyachie
-            printf( "\nIzolirovannie i visyachie vershini:\n" );
-            for ( int i = 0; i < 11; i++ ) {
-                if ( stepNap[i][0] == 0 && stepNap[i][1] == 0 ) {
-                    printf( "Vershina %i - izolirovana\n", (i+1) );
-                }
-                else if ( ( stepNap[i][0] == 1 && stepNap[i][1] == 0 ) ||  ( stepNap[i][0] == 0 && stepNap[i][1] == 1 ) ) {
-                    printf( "Vershina %i - visyachaya\n", (i+1) );
-                }
-            }
-            //puti grafa 2
-            double** some = randmm(11,11);
-            double** puti = step(A, A, some, 11, 11 );
-
-            printf( "\nPuti dlinnoyu 2:\n" );
-            for ( int i = 0; i < 11; i++ ) {
-                for ( int j = 0; j < 11; j++ ) {
-                    if ( puti[i][j] != 1 && i != j ) {
-                        printf( "%i->%i  ", i+1, j+1 );
-                    }
-                }
-                printf( "\n" );
-            }
-            //puti grafa 3
-            printf( "\nPuti dlinnoyu 3:\n" );
-            puti = step(puti,A,some,11,11);
-            for ( int i = 0; i < 11; i++ ) {
-                for ( int j = 0; j < 11; j++ ) {
-                    if ( puti[i][j] != 0 && i != j ) {
-                        printf( "%i->%i  ", i+1, j+1 );
-                    }
-                }
-                printf( "\n" );
-            }
-            //matrix of dostizhimost
-            printf( "\nMatrix dostizhimosti:\n" );
-            double** matDos = randmm(11,11);
-            for( int i = 0; i < 11; i++ )
-            {
-                for ( int j = 0; j < 11; j++ )
-                {
-                    puti[i][j] = A[i][j];
-                    matDos[i][j] = A[i][j];
-                }
-            }
-            for ( int i = 0; i < 10; i++ )
-            {
-                puti = step(puti,A,some,11,11);
-                for ( int k = 0; k < 11; k++ )
-                {
-                    for ( int f = 0; f < 11; f++ )
-                    {
-                        if ( puti[k][f] != 0 || matDos[k][f] != 0 ) matDos[k][f] = 1;
-                        else matDos[k][f] = 0;
-                    }
-                }
-
-            }
-            for (int i = 0; i < 11; i++)
-            {
-                for (int j = 0; j < 11; j++)
-                {
-                    printf("%.0f ", matDos[i][j]);
-                }
-                printf("\n");
-            }
-            //silnosvyaz
-            printf( "\nMatrix silnoy svyazi:\n" );
-            double** smt = randmm(11,11);
-            double** transported = transp(matDos,smt,11,11);
-            double components [11][11] = {};
-            for ( int i = 0; i < 11; i++ )
-            {
-                for ( int j = 0; j < 11; j++ )
-                {
-                    if ( matDos[i][j] != 0 && transported[i][j] != 0 ) smt[j][j] = 1;
-                    else smt[i][j] = 0;
-                    printf("%.0f ", smt[i][j]);
-                    components[i][j] = -1;
-                }
-                printf("\n");
-            }
-            printf( "\nComponents silnoy svyazi:\n" );
-            double checker[11] = {};
-            int someN = 0;
-            for (int i = 0; i < 11; i++ ) checker[i] = 0;
-            double** prettyNew = randmm(4,8);
-            int on = 0;
-            for ( int i = 0; i < 4; i++ ) {
-                for ( int j = 0; j < 8; j++ ) {
-                    prettyNew[i][j] = -1;
-                }
-            }
-            for ( int i = 0; i < 11; i++ )
-            {
-                if( checker[i] == 0 ) {
-                    printf("{ ");
-                    int on2 = 0;
-                    for ( int j = i; j < 11; j++ ) {
-                        if ( smt[i][j] == 1 ) {
-                            printf("%i, ", j+1);
-                            prettyNew[on][on2] = j;
-                            checker[j] = -1;
-                            someN++;
-                            on2++;
-                        }
-                    }
-                    printf(" },\n");
-                    on++;
-                }
-
-            }
-/*
-            for ( int i = 0; i < 4; i++ ) {
-                for ( int j = 0; j < 8; j++ ) {
-                    printf("%.0f ",prettyNew[i][j]);
-                }
-                printf("\n");
-            }
-*/
-            //kondensacia
-            //double** useless = randmm(someN,someN);
-
-            //double** condenMat = condenc(useless,prettyNew,A,someN,someN);
-
-            //drawings
             SelectObject(hdc, KPen);
             for (int i = 0; i < 11; i++)
             {
@@ -587,6 +319,277 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT messg,
               Ellipse ( hdc, nx[i]-dx, ny[i]-dy, nx[i]+dx, ny[i]+dy );
               TextOut ( hdc, nx[i]-dtx, ny[i]-dy/2, nn[i], 1 );
             }
+}
+
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
+
+char ProgName[] = "lab 3";
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow)
+{
+    HWND hWnd;
+    MSG lpMsg;
+
+    WNDCLASS w; //Г±Г®Г§Г¤Г ВёГ¬ ГЅГЄГ§ГҐГ¬ГЇГ«ГїГ° Г±ГІГ°ГіГЄГІГіГ°Г» WNDCLASS
+
+    w.lpszClassName=ProgName; //ГЁГ¬Гї ГЇГ°Г®ГЈГ°Г Г¬Г¬Г» - Г®ГЎГєГїГўГ«ГҐГ­Г® ГўГ»ГёГҐ
+    w.hInstance=hInstance; //ГЁГ¤ГҐГ­ГІГЁГґГЁГЄГ ГІГ®Г° ГІГҐГЄГіГ№ГҐГЈГ® ГЇГ°ГЁГ«Г®Г¦ГҐГ­ГЁГї
+    w.lpfnWndProc=WndProc; //ГіГЄГ Г§Г ГІГҐГ«Гј Г­Г  ГґГіГ­ГЄГ¶ГЁГѕ Г®ГЄГ­Г 
+    w.hCursor=LoadCursor(NULL, IDC_ARROW); //Г§Г ГЈГ°ГіГ¦Г ГҐГ¬ ГЄГіГ°Г±Г®Г°
+    w.hIcon=0; //ГЁГЄГ®Г­ГЄГЁ Гі Г­Г Г± Г­ГҐ ГЎГіГ¤ГҐГІ ГЇГ®ГЄГ 
+    w.lpszMenuName=0; //ГЁ Г¬ГҐГ­Гѕ ГЇГ®ГЄГ  Г­ГҐ ГЎГіГ¤ГҐГІ
+    w.hbrBackground = LTGRAY_BRUSH; //WHITE_BRUSH;// Г¶ГўГҐГІ ГґГ®Г­Г  Г®ГЄГ­Г 
+    w.style=CS_HREDRAW|CS_VREDRAW; //Г±ГІГЁГ«Гј - ГЇГҐГ°ГҐГ°ГЁГ±Г®ГўГ»ГўГ ГҐГ¬Г®ГҐ ГЇГ® Гµ ГЁ ГЇГ® Гі
+    w.cbClsExtra=0;
+    w.cbWndExtra=0;
+
+    if(!RegisterClass(&w))
+        return 0;
+
+   // HWND hWnd;
+    //MSG lpMsg;
+
+//Г‘Г®Г§Г¤Г Г¤ГЁГ¬ Г®ГЄГ­Г® Гў ГЇГ Г¬ГїГІГЁ, Г§Г ГЇГ®Г«Г­ГЁГў Г Г°ГЈГіГ¬ГҐГ­ГІГ» CreateWindow
+    hWnd=CreateWindow(ProgName, //Г€Г¬Гї ГЇГ°Г®ГЈГ°Г Г¬Г¬Г»
+        "lab 3", //Г‡Г ГЈГ®Г«Г®ГўГ®ГЄ Г®ГЄГ­Г 
+        WS_OVERLAPPEDWINDOW, //Г‘ГІГЁГ«Гј Г®ГЄГ­Г  - ГЇГҐГ°ГҐГЄГ°Г»ГўГ ГѕГ№ГҐГҐГ±Гї
+        0, //ГЇГ®Г«Г®Г¦ГҐГ­ГЁГҐ Г®ГЄГ­Г  Г­Г  ГЅГЄГ°Г Г­ГҐ ГЇГ® Гµ
+        0, //ГЇГ®Г«Г®Г¦ГҐГ­ГЁГҐ ГЇГ® Гі
+        1920, //ГёГЁГ°ГЁГ­Г 
+        1080, //ГўГЁГ±Г®ГІГ 
+        (HWND)NULL, //ГЁГ¤ГҐГ­ГІГЁГґГЁГЄГ ГІГ®Г° Г°Г®Г¤ГЁГІГҐГ«ГјГ±ГЄГ®ГЈГ® Г®ГЄГ­Г 
+        (HMENU)NULL, //ГЁГ¤ГҐГ­ГІГЁГґГЁГЄГ ГІГ®Г° Г¬ГҐГ­Гѕ
+        (HINSTANCE)hInstance, //ГЁГ¤ГҐГ­ГІГЁГґГЁГЄГ ГІГ®Г° ГЅГЄГ§ГҐГ¬ГЇГ«ГїГ°Г  ГЇГ°Г®ГЈГ°Г Г¬Г¬Г»
+        (HINSTANCE)NULL); //Г®ГІГ±ГіГІГ±ГІГўГЁГҐ Г¤Г®ГЇГ®Г«Г­ГЁГІГҐГ«ГјГ­Г»Гµ ГЇГ Г°Г Г¬ГҐГІГ°Г®Гў
+
+//Г‚Г»ГўГ®Г¤ГЁГ¬ Г®ГЄГ­Г® ГЁГ§ ГЇГ Г¬ГїГІГЁ Г­Г  ГЅГЄГ°Г Г­
+    ShowWindow(hWnd, nCmdShow);
+//ГЋГЎГ­Г®ГўГЁГ¬ Г±Г®Г¤ГҐГ°Г¦ГЁГ¬Г®ГҐ Г®ГЄГ­Г 
+ //   UpdateWindow(hWnd);
+
+//Г–ГЁГЄГ« Г®Г¤ГҐГ°Г¦Г Г­Г­Гї ГЇГ®ГўВіГ¤Г®Г¬Г«ГҐГ­Гј
+
+    while(GetMessage(&lpMsg, hWnd, 0, 0)) { //ГЏГ®Г«ГіГ·Г ГҐГ¬ Г±Г®Г®ГЎГ№ГҐГ­ГЁГҐ ГЁГ§ Г®Г·ГҐГ°ГҐГ¤ГЁ
+            TranslateMessage(&lpMsg); //ГЏГ°ГҐГ®ГЎГ°Г Г§ГіГҐГІ Г±Г®Г®ГЎГ№ГҐГ­ГЁГї ГЄГ«Г ГўГЁГё Гў Г±ГЁГ¬ГўГ®Г«Г»
+            DispatchMessage(&lpMsg); //ГЏГҐГ°ГҐГ¤Г ВёГІ Г±Г®Г®ГЎГ№ГҐГ­ГЁГҐ Г±Г®Г®ГІГўГҐГІГ±ГІГўГіГѕГ№ГҐГ© ГґГіГ­ГЄГ¶ГЁГЁ Г®ГЄГ­Г 
+        }
+    return(lpMsg.wParam);
+    }
+
+//Г”ГіГ­ГЄГ¶ГЁГї Г®ГЄГ­Г 
+LRESULT CALLBACK WndProc(HWND hWnd, UINT messg,
+                        WPARAM wParam, LPARAM lParam)
+    {
+    HDC hdc; //Г±Г®Г§Г¤Г ВёГ¬ ГЄГ®Г­ГІГҐГЄГ±ГІ ГіГ±ГІГ°Г®Г©Г±ГІГўГ 
+    PAINTSTRUCT ps; //Г±Г®Г§Г¤Г ВёГ¬ ГЅГЄГ§ГҐГ¬ГЇГ«ГїГ° Г±ГІГ°ГіГЄГІГіГ°Г» ГЈГ°Г ГґГЁГ·ГҐГ±ГЄГ®ГЈГ® ГўГ»ГўГ®Г¤Г 
+
+
+
+//Г–ГЁГЄГ« Г®ГЎГ°Г ГЎГ®ГІГЄГЁ Г±Г®Г®ГЎГ№ГҐГ­ГЁГ©
+    switch(messg){
+    //Г±Г®Г®ГЎГ№ГҐГ­ГЁГҐ Г°ГЁГ±Г®ГўГ Г­ГЁГї
+        case WM_PAINT :
+
+
+            hdc=BeginPaint(hWnd, &ps);
+
+
+
+            srand(0315);
+            double** T = randmm(11, 11);
+            double coef = 1.0 - 1*0.005 - 5*0.005 - 0.27;
+            double** A = mulmr(coef, T, 11, 11);
+            //naprav graf matrix
+            printf("\nMatrix:\n");
+            for (int i = 0; i < 11; i++)
+            {
+                for (int j = 0; j < 11; j++)
+                {
+                    printf("%.0f ", A[i][j]);
+                }
+                printf("\n");
+            }
+            //nenaprav graf matrix
+            double B[11][11] = {};
+            for (int i = 0; i < 11; i++)
+            {
+                for (int j = 0; j < 11; j++)
+                {
+                    B[i][j] = A[i][j];
+                }
+            }
+            printf("\nMirror Matrix:\n");
+            for ( int i = 0; i < 11; i++ )
+            {
+                for ( int j = 0; j < 11; j++ )
+                {
+                    if ( B[i][j] == 1 ){
+                        B[j][i] = 1;
+                    }
+                    printf("%.0f ", B[i][j]);
+                }
+                printf("\n");
+            }
+
+            //stepeni nenaprav
+            int stepNenap[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            printf("\nStepeni nenaprav:\n");
+            for ( int i = 0; i < 11; i++ ) {
+                for ( int j = i; j < 11; j++ ) {
+                    if ( B[i][j] == 1 ) {
+                        stepNenap[i]++;
+                    }
+                }
+                printf("%i  ",stepNenap[i]);
+            }
+            printf("\n");
+            //stepeni naprav
+            int stepNap[11][2] = {};
+            for ( int i = 0; i < 11; i++ ) {
+                stepNap[i][0] = 0;
+                stepNap[i][1] = 0;
+            }
+            for ( int i = 0; i < 11; i++ ) {
+                for ( int j = 0; j < 11; j++ ) {
+                    if ( A[i][j] == 1 ) {
+                        stepNap[i][0]++;
+                        stepNap[j][1]++;
+                    }
+                }
+            }
+            printf("\nStepeni naprav:");
+            printf("\nVixod\tZaxod\n");
+            for ( int i = 0; i < 11; i++ ) {
+                printf( "%i\t%i\n", stepNap[i][0], stepNap[i][1] );
+            }
+            //izolirovannie i visyachie
+            printf( "\nIzolirovannie i visyachie vershini:\n" );
+            for ( int i = 0; i < 11; i++ ) {
+                if ( stepNap[i][0] == 0 && stepNap[i][1] == 0 ) {
+                    printf( "Vershina %i - izolirovana\n", (i+1) );
+                }
+                else if ( ( stepNap[i][0] == 1 && stepNap[i][1] == 0 ) ||  ( stepNap[i][0] == 0 && stepNap[i][1] == 1 ) ) {
+                    printf( "Vershina %i - visyachaya\n", (i+1) );
+                }
+            }
+            //puti grafa 2
+            double** some = randmm(11,11);
+            double** puti = step(A, A, some, 11, 11 );
+
+            printf( "\nPuti dlinnoyu 2:\n" );
+            for ( int i = 0; i < 11; i++ ) {
+                for ( int j = 0; j < 11; j++ ) {
+                    if ( puti[i][j] != 1 && i != j ) {
+                        printf( "%i->%i  ", i+1, j+1 );
+                    }
+                }
+                printf( "\n" );
+            }
+            //puti grafa 3
+            printf( "\nPuti dlinnoyu 3:\n" );
+            puti = step(puti,A,some,11,11);
+            for ( int i = 0; i < 11; i++ ) {
+                for ( int j = 0; j < 11; j++ ) {
+                    if ( puti[i][j] != 0 && i != j ) {
+                        printf( "%i->%i  ", i+1, j+1 );
+                    }
+                }
+                printf( "\n" );
+            }
+            //matrix of dostizhimost
+            printf( "\nMatrix dostizhimosti:\n" );
+            double** matDos = randmm(11,11);
+            for( int i = 0; i < 11; i++ )
+            {
+                for ( int j = 0; j < 11; j++ )
+                {
+                    puti[i][j] = A[i][j];
+                    matDos[i][j] = A[i][j];
+                }
+            }
+            for ( int i = 0; i < 10; i++ )
+            {
+                puti = step(puti,A,some,11,11);
+                for ( int k = 0; k < 11; k++ )
+                {
+                    for ( int f = 0; f < 11; f++ )
+                    {
+                        if ( puti[k][f] != 0 || matDos[k][f] != 0 ) matDos[k][f] = 1;
+                        else matDos[k][f] = 0;
+                    }
+                }
+
+            }
+            for (int i = 0; i < 11; i++)
+            {
+                for (int j = 0; j < 11; j++)
+                {
+                    printf("%.0f ", matDos[i][j]);
+                }
+                printf("\n");
+            }
+            //silnosvyaz
+            printf( "\nMatrix silnoy svyazi:\n" );
+            double** smt = randmm(11,11);
+            double** transported = transp(matDos,smt,11,11);
+            double components [11][11] = {};
+            for ( int i = 0; i < 11; i++ )
+            {
+                for ( int j = 0; j < 11; j++ )
+                {
+                    if ( matDos[i][j] != 0 && transported[i][j] != 0 ) smt[j][j] = 1;
+                    else smt[i][j] = 0;
+                    printf("%.0f ", smt[i][j]);
+                    components[i][j] = -1;
+                }
+                printf("\n");
+            }
+            printf( "\nComponents silnoy svyazi:\n" );
+            double checker[11] = {};
+            int someN = 0;
+            for (int i = 0; i < 11; i++ ) checker[i] = 0;
+            double** prettyNew = randmm(4,8);
+            int on = 0;
+            for ( int i = 0; i < 4; i++ ) {
+                for ( int j = 0; j < 8; j++ ) {
+                    prettyNew[i][j] = -1;
+                }
+            }
+            for ( int i = 0; i < 11; i++ )
+            {
+                if( checker[i] == 0 ) {
+                    printf("{ ");
+                    int on2 = 0;
+                    for ( int j = i; j < 11; j++ ) {
+                        if ( smt[i][j] == 1 ) {
+                            printf("%i, ", j+1);
+                            prettyNew[on][on2] = j;
+                            checker[j] = -1;
+                            someN++;
+                            on2++;
+                        }
+                    }
+                    printf(" },\n");
+                    on++;
+                }
+
+            }
+/*
+            for ( int i = 0; i < 4; i++ ) {
+                for ( int j = 0; j < 8; j++ ) {
+                    printf("%.0f ",prettyNew[i][j]);
+                }
+                printf("\n");
+            }
+*/
+            //kondensacia
+            //double** useless = randmm(someN,someN);
+
+            //double** condenMat = condenc(useless,prettyNew,A,someN,someN);
+
+            //drawings
+            drawer( hdc, A );
             EndPaint(hWnd, &ps);
             break;
 
