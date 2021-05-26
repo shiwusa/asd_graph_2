@@ -83,7 +83,7 @@ double** condenc (double** mat, double** checkin, double** svyaz, int row, int c
     return mat;
 }
 
-void drawer ( HDC hdc, double** A )
+void drawer ( HDC hdc, double** A, int rows )
 {
             char *nn[11] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b"};
             void arrow(float fi, int px,int py){
@@ -124,9 +124,9 @@ void drawer ( HDC hdc, double** A )
             HPEN BPen = CreatePen(PS_SOLID, 2, RGB(50, 0, 255));
             HPEN KPen = CreatePen(PS_SOLID, 1, RGB(20, 20, 5));
             SelectObject(hdc, KPen);
-            for (int i = 0; i < 11; i++)
+            for (int i = 0; i < rows; i++)
             {
-                for (int j = 0; j < 11; j++)
+                for (int j = 0; j < rows; j++)
                 {
                     if ( A[i][j] == 1 ) {
                         MoveToEx(hdc, nx[i], ny[i], NULL);
@@ -315,7 +315,7 @@ void drawer ( HDC hdc, double** A )
                 }
             }
             SelectObject(hdc, BPen);
-            for ( i = 0; i <= 10; i++ ){
+            for ( i = 0; i < rows; i++ ){
               Ellipse ( hdc, nx[i]-dx, ny[i]-dy, nx[i]+dx, ny[i]+dy );
               TextOut ( hdc, nx[i]-dtx, ny[i]-dy/2, nn[i], 1 );
             }
@@ -411,6 +411,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT messg,
                 printf("\n");
             }
             //nenaprav graf matrix
+            drawer( hdc, A, 11 );
             double B[11][11] = {};
             for (int i = 0; i < 11; i++)
             {
@@ -547,15 +548,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT messg,
             }
             printf( "\nComponents silnoy svyazi:\n" );
             double checker[11] = {};
-            int someN = 0;
             for (int i = 0; i < 11; i++ ) checker[i] = 0;
-            double** prettyNew = randmm(4,8);
+
             int on = 0;
-            for ( int i = 0; i < 4; i++ ) {
-                for ( int j = 0; j < 8; j++ ) {
-                    prettyNew[i][j] = -1;
-                }
-            }
+            double** pretty = randmm(11,11);
+            for ( int i = 0; i < on; i++ )
+                for ( int j = 0; j < on; j++ )
+                    pretty[i][j] = -1;
+
             for ( int i = 0; i < 11; i++ )
             {
                 if( checker[i] == 0 ) {
@@ -564,17 +564,40 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT messg,
                     for ( int j = i; j < 11; j++ ) {
                         if ( smt[i][j] == 1 ) {
                             printf("%i, ", j+1);
-                            prettyNew[on][on2] = j;
                             checker[j] = -1;
-                            someN++;
+                            pretty[on][on2] = j;
                             on2++;
                         }
+                        pretty[on][10] = on2;
                     }
                     printf(" },\n");
                     on++;
                 }
 
             }
+            double** prettyNew = randmm(on,on);
+            for ( int i = 0; i < on; i++ )
+                for ( int j = 0; j < on; j++ )
+                    prettyNew[i][j] = 0;
+            int a = pretty[1][10];
+            int b = pretty[0][10];
+            int from = -1;
+            int to = -1;
+            for ( int i = 1; i <= a; i++ )
+                for ( int j = 0; j <= b; j++ )
+                if ( smt[i][j] ) {
+                    pretty[i][1] = 1;
+                    break;
+                }
+            printf("\nto draw condenc graph\n");
+            int x = -1;
+            while ( 1 )
+            {
+                printf("write number > 0\n");
+                scanf("%i", &x);
+                if ( x > 0 ) break;
+            }
+            drawer(hdc, pretty, on);
 /*
             for ( int i = 0; i < 4; i++ ) {
                 for ( int j = 0; j < 8; j++ ) {
@@ -589,7 +612,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT messg,
             //double** condenMat = condenc(useless,prettyNew,A,someN,someN);
 
             //drawings
-            drawer( hdc, A );
             EndPaint(hWnd, &ps);
             break;
 
