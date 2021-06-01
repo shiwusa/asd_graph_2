@@ -6,7 +6,7 @@
 int globalChecker = 0;
 double** A = NULL;
 double** prettyNew = NULL;
-double** randmm(int rows, int cols)
+double** randmm ( int rows, int cols )
 {
     double** matrix = (double**)malloc(rows * sizeof(double*));
 
@@ -37,7 +37,7 @@ void zhdac ( HWND* hWnd )
 	}
 }
 
-double** mulmr(double num, double **mat, int rows, int cols)
+double** mulmr ( double num, double **mat, int rows, int cols )
 {
     for (int i = 0; i < rows; i++)
     {
@@ -55,38 +55,38 @@ double** mulmr(double num, double **mat, int rows, int cols)
     return mat;
 }
 
-double** step (double **fMat, double **Smat, double **Rmat, int rows, int cols)
+double** step (double **firstMat, double **Secondmat, double **Rowmat, int rows, int cols)
 {
     for ( int i = 0; i < rows; i++ )
     {
         for ( int j = 0; j < cols; j++ )
         {
-            Rmat[i][j] = 0;
+            Rowmat[i][j] = 0;
             for ( int k = 0; k < cols; k++ )
             {
-                Rmat[i][j] += fMat[i][k] * Smat[k][j];
+                Rowmat[i][j] += firstMat[i][k] * Secondmat[k][j];
             }
         }
     }
-    return Rmat;
+    return Rowmat;
 }
 
-double** transp (double **mat, double **Rmat, int rows, int cols)
+double** transp ( double **mat, double **Rowmat, int rows, int cols )
 {
     for ( int i = 0; i < rows; i++ ) {
         for ( int j = 0; j < cols; j++ ) {
-            Rmat[i][j] = 0;
+            Rowmat[i][j] = 0;
         }
     }
     for ( int i = 0; i < rows; i++ ) {
         for ( int j = 0; j < cols; j++ ) {
-            Rmat[j][i] = mat[i][j];
+            Rowmat[j][i] = mat[i][j];
         }
     }
-    return Rmat;
+    return Rowmat;
 }
 
-double** condenc (double** mat, double** checkin, double** svyaz, int row, int cols)
+double** condenc ( double** mat, double** checkin, double** svyaz, int row, int cols )
 {
     for ( int i = 0; i < row; i++ ) {
         for ( int k = 0; k < 8; k++ ) {
